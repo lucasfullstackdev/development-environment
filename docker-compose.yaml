@@ -1,0 +1,32 @@
+version: '3.5'
+
+services:
+
+    api:
+      container_name: ${API_CONTAINER_NAME} 
+      command: sh -c "composer install && php artisan key:generate && php artisan serve --host=0.0.0.0"
+      working_dir: /app
+      build:
+        dockerfile: Dockerfile
+        context: .
+      ports:
+        - ${API_EXTERNAL_PORT}:8000
+      depends_on:
+        - db
+      volumes:
+        - ./projetos/${DIR_PROJECT}:/app
+      env_file:
+        - ./projetos/${DIR_PROJECT}/${API_LOCAL_ENV}
+
+    db:
+        container_name: ${DB_CONTAINER_NAME} 
+        image: mysql
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        ports:
+          - ${DB_EXTERNAL_PORT}:3306
+        volumes:
+            - /var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_NAME}
