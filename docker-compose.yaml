@@ -7,16 +7,29 @@ services:
       command: sh -c "composer install && php artisan key:generate && php artisan serve --host=0.0.0.0"
       working_dir: /app
       build:
-        dockerfile: Dockerfile
-        context: .
+        dockerfile: php.Dockerfile
+        context: ./Dockerfiles
       ports:
         - ${API_EXTERNAL_PORT}:8000
       depends_on:
         - db
       volumes:
-        - ./projetos/${DIR_PROJECT}:/app
+        - ./projetos/${API_DIRECTORY}:/app
       env_file:
-        - ./projetos/${DIR_PROJECT}/${API_LOCAL_ENV}
+        - ./projetos/${API_DIRECTORY}/${API_LOCAL_ENV}
+
+    front:
+      container_name: ${FRONT_CONTAINER_NAME}
+      image: node:19
+      command: sh -c "npm install && npm run serve --host=0.0.0.0"
+      working_dir: /app
+      ports:
+        - ${FRONT_EXTERNAL_PORT}:8080
+      volumes:
+        - ./projetos/${FRONT_DIRECTORY}:/app
+      env_file:
+        - ./projetos/${FRONT_DIRECTORY}/${FRONT_LOCAL_ENV}
+
 
     db:
         container_name: ${DB_CONTAINER_NAME} 
